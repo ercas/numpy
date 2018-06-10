@@ -330,7 +330,7 @@ def polymulx(c):
     return prd
 
 
-def polymul(c1, c2):
+def _polymul(c1, c2):
     """
     Multiply one polynomial by another.
 
@@ -352,21 +352,50 @@ def polymul(c1, c2):
     See Also
     --------
     polyadd, polysub, polydiv, polypow
-
-    Examples
-    --------
-    >>> from numpy.polynomial import polynomial as P
-    >>> c1 = (1,2,3)
-    >>> c2 = (3,2,1)
-    >>> P.polymul(c1,c2)
-    array([  3.,   8.,  14.,   8.,   3.])
-
     """
+
     # c1, c2 are trimmed copies
     [c1, c2] = pu.as_series([c1, c2])
     ret = np.convolve(c1, c2)
     return pu.trimseq(ret)
 
+def polymul(*polynomials):
+    """
+    Multiply multiple polynomials together
+
+    Returns the product of polynomials `*polynomials`.  The arguments are
+    sequences of coefficients, from lowest order term to highest, e.g.,
+    [1,2,3] represents the polynomial ``1 + 2*x + 3*x**2.``
+
+    Parameters
+    ----------
+    *polynomials : array_like
+        1-D arrays of coefficients representing a polynomial, relative to the
+        "standard" basis, and ordered from lowest order term to highest.
+
+    Returns
+    -------
+    out : ndarray
+        Of the coefficients of their product.
+
+    See Also
+    --------
+    polyadd, polysub, polydiv, polypow
+
+    Examples
+    --------
+    >>> from numpy.polynomial import polynomial as P
+    >>> c1 = (1,2,3)
+    >>> c2 = (2,3,1)
+    >>> c3 = (3,1,2)
+    >>> P.polymul(c1,c2,c3)
+    array([ 6, 23, 50, 60, 46, 25,  6])
+
+    """
+    if (len(polynomials) == 1):
+        return polynomials[0]
+    else:
+        return polymul(polynomials[0], polymul(*polynomials[1:]))
 
 def polydiv(c1, c2):
     """
